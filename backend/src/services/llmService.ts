@@ -56,13 +56,40 @@ Always respond in strict JSON following this exact schema:
   ]
 }
 
-Important:
+CRITICAL REQUIREMENTS FOR URLS:
+- ONLY use real, existing, and accessible URLs from well-known educational platforms
+- Use official documentation sites (e.g., developer.mozilla.org, docs.python.org, react.dev)
+- Use popular learning platforms (e.g., freecodecamp.org, coursera.org, udemy.com, youtube.com)
+- Use official GitHub repositories (github.com)
+- Use official documentation for frameworks and libraries
+- NEVER create fake URLs or placeholder URLs
+- NEVER use example.com, placeholder.com, or any dummy domains
+- Verify URLs are from reputable sources before including them
+- For books, use Amazon, Goodreads, or official publisher websites
+- For videos, use YouTube, Vimeo, or official channel links
+
+Valid URL examples:
+- https://developer.mozilla.org/en-US/docs/Web/HTML
+- https://react.dev/learn
+- https://www.freecodecamp.org/learn
+- https://docs.python.org/3/tutorial/
+- https://github.com/facebook/react
+- https://www.youtube.com/watch?v=...
+- https://www.coursera.org/learn/...
+
+Invalid URL examples (DO NOT USE):
+- https://example.com/tutorial
+- https://placeholder.com/resource
+- https://learn-x.com (fake domains)
+- Any URL you cannot verify exists
+
+Other Important Rules:
 - Return ONLY valid JSON, no markdown, no code blocks
 - Include 3-6 main branches
 - Each branch should have 3-5 subtopics
 - Each subtopic should have 1-2 learning resources
-- Ensure all URLs are valid and accessible
-- Descriptions should be concise (1-2 sentences)`;
+- Descriptions should be concise (1-2 sentences)
+- All URLs MUST be real and accessible`;
 
 export async function generateLearningRoadmap(
   topic: string,
@@ -71,6 +98,15 @@ export async function generateLearningRoadmap(
   const userPrompt = `Generate a learning roadmap for: ${topic}.
 Tailor it for ${level} learners.
 Include 3–6 main branches, each with 3–5 subtopics and 1–2 learning resources (article/video/book).
+
+CRITICAL: Only include REAL, VERIFIED URLs from:
+- Official documentation (MDN, official docs sites)
+- Reputable learning platforms (freeCodeCamp, Coursera, Udemy, Khan Academy)
+- Official GitHub repositories
+- YouTube channels (with real video IDs)
+- Official websites and blogs
+
+DO NOT create fake URLs. Every URL must be a real, accessible link that exists on the internet.
 Respond only with valid JSON.`;
 
   try {
@@ -108,6 +144,44 @@ Respond only with valid JSON.`;
     if (!roadmap.topic || !roadmap.branches || !Array.isArray(roadmap.branches)) {
       throw new Error('Invalid roadmap structure received from Gemini');
     }
+
+    // Validate and filter out invalid URLs
+    roadmap.branches.forEach((branch) => {
+      branch.subtopics.forEach((subtopic) => {
+        subtopic.resources = subtopic.resources.filter((resource) => {
+          // Basic URL validation
+          try {
+            const url = new URL(resource.url);
+            // Check for common invalid domains
+            const invalidDomains = [
+              'example.com',
+              'placeholder.com',
+              'test.com',
+              'dummy.com',
+              'fake.com',
+            ];
+            const hostname = url.hostname.toLowerCase();
+            
+            // Filter out invalid domains
+            if (invalidDomains.some((domain) => hostname.includes(domain))) {
+              console.warn(`Filtered out invalid URL: ${resource.url}`);
+              return false;
+            }
+            
+            // Ensure URL has a valid protocol
+            if (!['http:', 'https:'].includes(url.protocol)) {
+              return false;
+            }
+            
+            return true;
+          } catch (e) {
+            // Invalid URL format
+            console.warn(`Filtered out malformed URL: ${resource.url}`);
+            return false;
+          }
+        });
+      });
+    });
 
     return roadmap;
   } catch (error: any) {

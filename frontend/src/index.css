@@ -4,13 +4,104 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-yellow-100 text-black;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 }
 
 @layer utilities {
+  /* Neo Brutalism Utility Classes */
+  .neo-border {
+    border: 4px solid #000;
+  }
+  
+  .neo-border-thick {
+    border: 6px solid #000;
+  }
+  
+  .neo-shadow {
+    box-shadow: 8px 8px 0px 0px #000;
+  }
+  
+  .neo-shadow-sm {
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+  
+  .neo-shadow-lg {
+    box-shadow: 12px 12px 0px 0px #000;
+  }
+  
+  .neo-button {
+    @apply neo-border neo-shadow bg-cyan-400 font-black uppercase tracking-wide;
+    transition: all 0.1s ease;
+  }
+  
+  .neo-button:hover:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 6px 6px 0px 0px #000;
+  }
+  
+  .neo-button:active:not(:disabled) {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+  
+  .neo-button:disabled {
+    @apply bg-gray-300 text-gray-500 cursor-not-allowed;
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+  
+  .neo-input {
+    @apply neo-border bg-white font-bold;
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+  
+  .neo-input:focus {
+    @apply outline-none;
+    box-shadow: 6px 6px 0px 0px #000;
+    transform: translate(-2px, -2px);
+  }
+  
+  .neo-card {
+    @apply neo-border bg-white neo-shadow;
+  }
+  
   .react-flow__node {
-    @apply shadow-lg;
+    @apply neo-border;
+  }
+  
+  /* Ensure links in nodes are clickable */
+  .react-flow__node a {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Prevent React Flow from blocking pointer events on links */
+  .react-flow__node-content {
+    pointer-events: auto;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  /* Smooth transitions */
+  * {
+    transition-property: opacity, transform, scale;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 

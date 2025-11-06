@@ -18,46 +18,66 @@ export default function TopicInput({ onGenerate, loading }: TopicInputProps) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
-        <div className="mb-4">
-          <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-2">
-            Enter a Topic
+      <form onSubmit={handleSubmit} className="neo-card p-8">
+        <div className="mb-6">
+          <label htmlFor="topic" className="block font-black text-black uppercase mb-3 text-lg">
+            🎯 Enter a Topic
           </label>
           <input
             id="topic"
             type="text"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            placeholder="e.g., Web Development, Machine Learning, Photography..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+            placeholder="Web Development, Machine Learning, Photography..."
+            className="neo-input w-full px-5 py-4 text-lg"
             disabled={loading}
+            autoFocus
           />
+          <p className="text-xs text-black font-bold mt-2">
+            💡 Tip: Be specific! Try "React Development" instead of just "Programming"
+          </p>
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-2">
-            Learning Level
+        <div className="mb-6">
+          <label htmlFor="level" className="block font-black text-black uppercase mb-3 text-lg">
+            📚 Learning Level
           </label>
           <select
             id="level"
             value={level}
             onChange={(e) => setLevel(e.target.value as 'beginner' | 'intermediate' | 'advanced')}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+            className="neo-input w-full px-5 py-4 text-lg uppercase font-black"
             disabled={loading}
           >
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
+            <option value="beginner">🌱 Beginner</option>
+            <option value="intermediate">🚀 Intermediate</option>
+            <option value="advanced">⚡ Advanced</option>
           </select>
         </div>
 
         <button
           type="submit"
           disabled={loading || !topic.trim()}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+          className="neo-button w-full py-4 text-xl relative overflow-hidden"
         >
-          {loading ? 'Generating...' : 'Generate Learning Map'}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="animate-pulse">⚙️</span>
+              Generating...
+            </span>
+          ) : (
+            <span className="flex items-center justify-center gap-2">
+              <span>✨</span>
+              Generate Learning Map
+            </span>
+          )}
         </button>
+        
+        {!loading && topic.trim() && (
+          <p className="text-center text-xs text-black font-bold mt-4">
+            Ready to create your roadmap! 🗺️
+          </p>
+        )}
       </form>
     </div>
   );

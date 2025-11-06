@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import TopicInput from './components/TopicInput';
 import LearningMap from './components/LearningMap';
 import { LearningRoadmap } from './types';
@@ -7,6 +7,8 @@ function App() {
   const [roadmap, setRoadmap] = useState<LearningRoadmap | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const roadmapRef = useRef<HTMLDivElement>(null);
+  const [showRoadmap, setShowRoadmap] = useState(false);
 
   const handleGenerate = async (topic: string, level: 'beginner' | 'intermediate' | 'advanced') => {
     setLoading(true);
@@ -29,6 +31,15 @@ function App() {
       }
 
       setRoadmap(data.data);
+      setShowRoadmap(true);
+      
+      // Smooth scroll to roadmap after a brief delay
+      setTimeout(() => {
+        roadmapRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }, 300);
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred');
       console.error('Error generating roadmap:', err);
@@ -50,51 +61,108 @@ function App() {
     linkElement.click();
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Reset showRoadmap when generating new roadmap
+  useEffect(() => {
+    if (loading) {
+      setShowRoadmap(false);
+    }
+  }, [loading]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-yellow-100">
       <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-gray-900 mb-2">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Inagiffy
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600">
-            AI-Powered Interactive Learning Maps
-          </p>
+        {/* Header Section */}
+        <header className={`text-center mb-12 transition-all duration-500 ${showRoadmap ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
+          <div className="inline-block neo-border-thick neo-shadow-lg bg-magenta-400 px-8 py-4 mb-4">
+            <h1 className="text-6xl font-black text-black uppercase tracking-tight">
+              INAGIFFY
+            </h1>
+          </div>
+          <div className="neo-border neo-shadow bg-cyan-400 inline-block px-6 py-2">
+            <p className="text-xl font-black text-black uppercase">
+              AI-Powered Learning Maps
+            </p>
+          </div>
         </header>
 
-        <TopicInput onGenerate={handleGenerate} loading={loading} />
+        {/* Input Section */}
+        <div className={`transition-all duration-500 ${showRoadmap ? 'opacity-30 scale-95' : 'opacity-100 scale-100'}`}>
+          <TopicInput onGenerate={handleGenerate} loading={loading} />
+        </div>
 
+        {/* Error Message */}
         {error && (
-          <div className="mt-6 max-w-2xl mx-auto">
-            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-              <strong>Error:</strong> {error}
+          <div className="mt-6 max-w-2xl mx-auto animate-fadeIn">
+            <div className="neo-border neo-shadow bg-red-400 px-6 py-4">
+              <p className="font-black text-black uppercase text-lg">
+                ⚠️ Error: {error}
+              </p>
             </div>
           </div>
         )}
 
-        {roadmap && (
-          <div className="mt-8">
-            <div className="flex justify-between items-center mb-4 max-w-7xl mx-auto">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Learning Map: {roadmap.topic}
-              </h2>
-              <button
-                onClick={handleExport}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
-              >
-                Export JSON
-              </button>
-            </div>
-            <LearningMap roadmap={roadmap} />
-          </div>
-        )}
-
+        {/* Loading State */}
         {loading && (
-          <div className="mt-8 text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
-            <p className="mt-4 text-gray-600">Generating your learning map...</p>
+          <div className="mt-12 text-center animate-fadeIn">
+            <div className="neo-border-thick neo-shadow-lg bg-white inline-block p-8">
+              <div className="neo-border-thick bg-cyan-400 w-16 h-16 mx-auto mb-4 animate-pulse"></div>
+              <p className="font-black text-black uppercase text-xl">
+                Generating Your Learning Map...
+              </p>
+              <p className="text-sm text-black font-bold mt-2">
+                This may take a few seconds
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Roadmap Section - Main Focus */}
+        {roadmap && (
+          <div 
+            ref={roadmapRef}
+            className={`mt-16 transition-all duration-700 ${showRoadmap ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-10'}`}
+          >
+            {/* Roadmap Header with Actions */}
+            <div className="max-w-7xl mx-auto mb-6">
+              <div className="neo-border-thick neo-shadow-lg bg-white p-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <div className="neo-border neo-shadow-sm bg-magenta-400 inline-block px-4 py-2 mb-2">
+                      <p className="text-xs font-black text-black uppercase">Learning Roadmap</p>
+                    </div>
+                    <h2 className="text-4xl font-black text-black uppercase mt-2">
+                      {roadmap.topic}
+                    </h2>
+                    <p className="text-sm text-black font-bold mt-2">
+                      {roadmap.branches.length} main branches • {roadmap.branches.reduce((acc, b) => acc + b.subtopics.length, 0)} subtopics
+                    </p>
+                  </div>
+                  <div className="flex gap-3 flex-wrap">
+                    <button
+                      onClick={handleExport}
+                      className="neo-button px-6 py-3 text-base"
+                    >
+                      📥 Export JSON
+                    </button>
+                    <button
+                      onClick={scrollToTop}
+                      className="neo-border neo-shadow bg-yellow-300 px-6 py-3 text-base font-black text-black uppercase"
+                    >
+                      ↑ Back to Top
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Roadmap Visualization */}
+            <div className="neo-border-thick neo-shadow-lg bg-white p-4 animate-fadeIn">
+              <LearningMap roadmap={roadmap} />
+            </div>
           </div>
         )}
       </div>
