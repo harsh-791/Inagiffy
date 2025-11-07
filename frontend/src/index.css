@@ -103,5 +103,31 @@
     transition-property: opacity, transform, scale;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
+  
+  /* Expandable node animations */
+  .expandable-node {
+    transition: all 0.3s ease;
+  }
+  
+  .expandable-node:hover {
+    transform: scale(1.05);
+  }
+  
+  .expanded-content {
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      max-height: 1000px;
+      transform: translateY(0);
+    }
+  }
 }
 

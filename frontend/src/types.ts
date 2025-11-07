@@ -16,8 +16,16 @@ export interface Branch {
   subtopics: Subtopic[];
 }
 
+export interface RelatedTopic {
+  topic: string;
+  description: string;
+  reason: string;
+}
+
 export interface LearningRoadmap {
   topic: string;
   branches: Branch[];
+  relatedTopics?: RelatedTopic[];
+  nextLearningPaths?: RelatedTopic[];
 }
 

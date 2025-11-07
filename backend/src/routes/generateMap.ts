@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { generateLearningRoadmap } from '../services/llmService';
+import { generateLearningRoadmap, generateRelatedTopics } from '../services/llmService';
 
 const requestSchema = z.object({
   topic: z.string().min(1, 'Topic is required'),
@@ -31,9 +31,22 @@ export async function generateMap(req: Request, res: Response) {
     // Generate roadmap using LLM
     const roadmap = await generateLearningRoadmap(topic, level);
 
+    // Generate related topics and next learning paths (non-blocking)
+    let relatedTopics = { relatedTopics: [], nextLearningPaths: [] };
+    try {
+      relatedTopics = await generateRelatedTopics(topic, roadmap, level);
+    } catch (error) {
+      console.warn('Failed to generate related topics, continuing without them:', error);
+      // Continue without related topics if generation fails
+    }
+
     res.json({
       success: true,
-      data: roadmap,
+      data: {
+        ...roadmap,
+        relatedTopics: relatedTopics.relatedTopics,
+        nextLearningPaths: relatedTopics.nextLearningPaths,
+      },
     });
   } catch (error: any) {
     console.error('Error generating map:', error);

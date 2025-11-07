@@ -30,6 +30,17 @@ export interface LearningRoadmap {
   branches: Branch[];
 }
 
+export interface RelatedTopic {
+  topic: string;
+  description: string;
+  reason: string; // Why this topic is related or a good next step
+}
+
+export interface RelatedTopicsResponse {
+  relatedTopics: RelatedTopic[];
+  nextLearningPaths: RelatedTopic[];
+}
+
 const SYSTEM_PROMPT = `You are an expert educational content planner and topic mapper. Given a subject, you generate a structured, hierarchical roadmap breaking it into subtopics, with short descriptions and 1–2 recommended resources per subtopic.
 
 Always respond in strict JSON following this exact schema:
@@ -187,6 +198,99 @@ Respond only with valid JSON.`;
   } catch (error: any) {
     console.error('Gemini API error:', error);
     throw new Error(`Failed to generate roadmap: ${error.message}`);
+  }
+}
+
+export async function generateRelatedTopics(
+  currentTopic: string,
+  roadmap: LearningRoadmap,
+  level: 'beginner' | 'intermediate' | 'advanced' = 'intermediate'
+): Promise<RelatedTopicsResponse> {
+  const systemPrompt = `You are an expert educational advisor. Given a learning roadmap, suggest:
+1. Related topics that complement or expand on the current topic
+2. Next learning paths that logically follow after mastering the current topic
+
+Always respond in strict JSON following this exact schema:
+{
+  "relatedTopics": [
+    {
+      "topic": "string",
+      "description": "string (1-2 sentences)",
+      "reason": "string (why this topic is related)"
+    }
+  ],
+  "nextLearningPaths": [
+    {
+      "topic": "string",
+      "description": "string (1-2 sentences)",
+      "reason": "string (why this is a good next step)"
+    }
+  ]
+}
+
+Guidelines:
+- Suggest 4-6 related topics that are complementary or adjacent to the current topic
+- Suggest 3-5 next learning paths that represent logical progression after mastering the current topic
+- Make suggestions relevant to ${level} level learners
+- Be specific and actionable
+- Return ONLY valid JSON, no markdown, no code blocks`;
+
+  const branchNames = roadmap.branches.map(b => b.name).join(', ');
+  const userPrompt = `Current learning topic: ${currentTopic}
+Current roadmap branches: ${branchNames}
+
+Generate related topics and next learning paths for a ${level} level learner.
+Related topics should complement or expand on ${currentTopic}.
+Next learning paths should represent what to learn AFTER mastering ${currentTopic}.
+
+Respond only with valid JSON.`;
+
+  try {
+    const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: fullPrompt,
+    });
+
+    const content = response.text;
+
+    if (!content) {
+      throw new Error('No response from Gemini');
+    }
+
+    // Parse JSON response
+    let relatedTopicsData: RelatedTopicsResponse;
+    try {
+      relatedTopicsData = JSON.parse(content);
+    } catch (parseError) {
+      // Try to extract JSON from markdown code blocks if present
+      const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/) || content.match(/(\{[\s\S]*\})/);
+      if (jsonMatch) {
+        relatedTopicsData = JSON.parse(jsonMatch[1]);
+      } else {
+        throw new Error('Failed to parse JSON response from Gemini');
+      }
+    }
+
+    // Validate structure
+    if (!relatedTopicsData.relatedTopics || !Array.isArray(relatedTopicsData.relatedTopics) ||
+        !relatedTopicsData.nextLearningPaths || !Array.isArray(relatedTopicsData.nextLearningPaths)) {
+      throw new Error('Invalid related topics structure received from Gemini');
+    }
+
+    // Ensure we have reasonable number of suggestions
+    relatedTopicsData.relatedTopics = relatedTopicsData.relatedTopics.slice(0, 6);
+    relatedTopicsData.nextLearningPaths = relatedTopicsData.nextLearningPaths.slice(0, 5);
+
+    return relatedTopicsData;
+  } catch (error: any) {
+    console.error('Gemini API error generating related topics:', error);
+    // Return empty arrays on error instead of throwing
+    return {
+      relatedTopics: [],
+      nextLearningPaths: [],
+    };
   }
 }
 

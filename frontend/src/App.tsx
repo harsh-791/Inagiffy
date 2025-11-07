@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import TopicInput from './components/TopicInput';
 import LearningMap from './components/LearningMap';
+import RelatedTopics from './components/RelatedTopics';
 import { LearningRoadmap } from './types';
 
 function App() {
@@ -9,11 +10,13 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const roadmapRef = useRef<HTMLDivElement>(null);
   const [showRoadmap, setShowRoadmap] = useState(false);
+  const [currentLevel, setCurrentLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
 
   const handleGenerate = async (topic: string, level: 'beginner' | 'intermediate' | 'advanced') => {
     setLoading(true);
     setError(null);
     setRoadmap(null);
+    setCurrentLevel(level);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/generate-map`, {
@@ -63,6 +66,11 @@ function App() {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleRelatedTopicClick = (topic: string) => {
+    // Generate a new roadmap for the clicked related topic
+    handleGenerate(topic, currentLevel);
   };
 
   // Reset showRoadmap when generating new roadmap
@@ -161,8 +169,25 @@ function App() {
 
             {/* Roadmap Visualization */}
             <div className="neo-border-thick neo-shadow-lg bg-white p-4 animate-fadeIn">
+              <div className="mb-3 neo-border bg-yellow-300 px-4 py-2 inline-block">
+                <p className="text-xs font-black text-black uppercase">
+                  💡 Click any node to expand and see details
+                </p>
+              </div>
               <LearningMap roadmap={roadmap} />
             </div>
+
+            {/* Related Topics and Next Learning Paths */}
+            {roadmap && (roadmap.relatedTopics?.length > 0 || roadmap.nextLearningPaths?.length > 0) && (
+              <div className="max-w-7xl mx-auto">
+                <RelatedTopics
+                  relatedTopics={roadmap.relatedTopics || []}
+                  nextLearningPaths={roadmap.nextLearningPaths || []}
+                  onTopicClick={handleRelatedTopicClick}
+                  currentLevel={currentLevel}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
