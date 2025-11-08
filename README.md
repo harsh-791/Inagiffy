@@ -1,4 +1,5 @@
 # Inagiffy - AI-Powered Interactive Learning Maps
+[Screencast from 2025-11-08 23-47-16.webm](https://github.com/user-attachments/assets/294fbcf2-9520-4d45-b36a-d1b27fa8a5c1)
 
 Inagiffy is a full-stack web application that generates beautiful, interactive learning roadmaps for any topic using AI. Simply enter a topic, and watch as AI breaks it down into structured branches, subtopics, and learning resources.
 
@@ -18,7 +19,6 @@ Inagiffy is a full-stack web application that generates beautiful, interactive l
 - [Running Locally](#running-locally)
 - [API Documentation](#api-documentation)
 - [JSON Schema Reference](#json-schema-reference)
-- [Deployment](#deployment)
 - [Example Usage](#example-usage)
 
 ---
