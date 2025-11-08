@@ -41,23 +41,31 @@ function App() {
     setLastLevel(level);
 
     try {
+      const apiUrl = `${import.meta.env.VITE_API_URL || "/api"}/generate-map`;
+      console.log(`Making request to: ${apiUrl}`);
+      
       const timeoutId = setTimeout(() => {
         abortController.abort();
       }, 60000);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL || "/api"}/generate-map`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ topic, level }),
-          signal: abortController.signal,
-        }
-      );
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ topic, level }),
+        signal: abortController.signal,
+      });
 
       clearTimeout(timeoutId);
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        throw new Error(
+          `Server returned non-JSON response. ${response.status} ${response.statusText}. ${text.substring(0, 100)}`
+        );
+      }
 
       const data = await response.json();
 
