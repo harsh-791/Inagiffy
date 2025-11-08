@@ -149,7 +149,7 @@ function SubtopicNode({ data, selected }: { data: CustomNodeData; selected?: boo
   };
 
   const showAllResources = data.expanded && data.resources && data.resources.length > 2;
-  const displayedResources = showAllResources ? data.resources : (data.resources?.slice(0, 2) || []);
+  const displayedResources = showAllResources ? (data.resources || []) : (data.resources?.slice(0, 2) || []);
 
   return (
     <div 
@@ -334,7 +334,7 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction: 'TB' | 'LR
   return { nodes: layoutedNodes, edges };
 }
 
-function LayoutFlow({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) {
+function LayoutFlow({ nodes, edges: _edges }: { nodes: Node[]; edges: Edge[] }) {
   const { fitView } = useReactFlow();
   const initialFitDone = useRef(false);
 
@@ -381,6 +381,7 @@ export default function LearningMap({ roadmap }: LearningMapProps) {
       id: topicNodeId,
       type: 'topic',
       data: { label: roadmap.topic, isMain: true },
+      position: { x: 0, y: 0 },
     });
 
     roadmap.branches.forEach((branch, branchIndex) => {
@@ -398,6 +399,7 @@ export default function LearningMap({ roadmap }: LearningMapProps) {
           onExpand: () => toggleNode(branchNodeId),
         },
         selected: selectedNode === branchNodeId,
+        position: { x: 0, y: 0 },
       });
 
       edges.push({
@@ -424,6 +426,7 @@ export default function LearningMap({ roadmap }: LearningMapProps) {
               onExpand: () => toggleNode(subtopicNodeId),
             },
             selected: selectedNode === subtopicNodeId,
+            position: { x: 0, y: 0 },
           });
 
           edges.push({

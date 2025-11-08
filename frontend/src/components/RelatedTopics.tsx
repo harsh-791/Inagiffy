@@ -11,7 +11,7 @@ export default function RelatedTopics({
   relatedTopics,
   nextLearningPaths,
   onTopicClick,
-  currentLevel,
+  currentLevel: _currentLevel,
 }: RelatedTopicsProps) {
   if (relatedTopics.length === 0 && nextLearningPaths.length === 0) {
     return null;
