@@ -39,7 +39,7 @@ export async function generateMap(req: Request, res: Response) {
       relatedTopics = await generateRelatedTopics(topic, roadmap, level);
       console.log(`Generated ${relatedTopics.relatedTopics.length} related topics and ${relatedTopics.nextLearningPaths.length} next paths`);
     } catch (error) {
-      console.warn('Couldn't generate related topics, but roadmap is ready');
+      console.warn('Could not generate related topics, but roadmap is ready');
     }
 
     console.log('Sending response to client');
