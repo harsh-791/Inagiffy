@@ -1,10 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 
-// Load environment variables before creating Gemini client
 dotenv.config();
 
-// The client gets the API key from the environment variable GEMINI_API_KEY
 const ai = new GoogleGenAI({});
 
 export interface LearningResource {
@@ -33,7 +31,7 @@ export interface LearningRoadmap {
 export interface RelatedTopic {
   topic: string;
   description: string;
-  reason: string; // Why this topic is related or a good next step
+  reason: string;
 }
 
 export interface RelatedTopicsResponse {
@@ -121,11 +119,9 @@ DO NOT create fake URLs. Every URL must be a real, accessible link that exists o
 Respond only with valid JSON.`;
 
   try {
-    // Combine system prompt and user prompt for Gemini
     const fullPrompt = `${SYSTEM_PROMPT}\n\n${userPrompt}`;
 
-    // Use the official API format with gemini-2.5-flash
-    // Alternative models: 'gemini-2.5-pro' for better quality
+    console.log(`Sending request to Gemini API for: ${topic}`);
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: fullPrompt,
@@ -137,12 +133,12 @@ Respond only with valid JSON.`;
       throw new Error('No response from Gemini');
     }
 
-    // Parse JSON response
+    console.log('Received response from Gemini, parsing...');
+
     let roadmap: LearningRoadmap;
     try {
       roadmap = JSON.parse(content);
     } catch (parseError) {
-      // Try to extract JSON from markdown code blocks if present
       const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/) || content.match(/(\{[\s\S]*\})/);
       if (jsonMatch) {
         roadmap = JSON.parse(jsonMatch[1]);
@@ -151,19 +147,19 @@ Respond only with valid JSON.`;
       }
     }
 
-    // Validate structure
     if (!roadmap.topic || !roadmap.branches || !Array.isArray(roadmap.branches)) {
       throw new Error('Invalid roadmap structure received from Gemini');
     }
 
-    // Validate and filter out invalid URLs
+    console.log(`Validating ${roadmap.branches.length} branches and their resources...`);
+    let filteredCount = 0;
+
     roadmap.branches.forEach((branch) => {
       branch.subtopics.forEach((subtopic) => {
+        const originalCount = subtopic.resources.length;
         subtopic.resources = subtopic.resources.filter((resource) => {
-          // Basic URL validation
           try {
             const url = new URL(resource.url);
-            // Check for common invalid domains
             const invalidDomains = [
               'example.com',
               'placeholder.com',
@@ -173,27 +169,30 @@ Respond only with valid JSON.`;
             ];
             const hostname = url.hostname.toLowerCase();
             
-            // Filter out invalid domains
             if (invalidDomains.some((domain) => hostname.includes(domain))) {
-              console.warn(`Filtered out invalid URL: ${resource.url}`);
+              filteredCount++;
               return false;
             }
             
-            // Ensure URL has a valid protocol
             if (!['http:', 'https:'].includes(url.protocol)) {
+              filteredCount++;
               return false;
             }
             
             return true;
           } catch (e) {
-            // Invalid URL format
-            console.warn(`Filtered out malformed URL: ${resource.url}`);
+            filteredCount++;
             return false;
           }
         });
       });
     });
 
+    if (filteredCount > 0) {
+      console.log(`Filtered out ${filteredCount} invalid resource URLs`);
+    }
+
+    console.log('Roadmap validation complete');
     return roadmap;
   } catch (error: any) {
     console.error('Gemini API error:', error);
@@ -259,12 +258,10 @@ Respond only with valid JSON.`;
       throw new Error('No response from Gemini');
     }
 
-    // Parse JSON response
     let relatedTopicsData: RelatedTopicsResponse;
     try {
       relatedTopicsData = JSON.parse(content);
     } catch (parseError) {
-      // Try to extract JSON from markdown code blocks if present
       const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/) || content.match(/(\{[\s\S]*\})/);
       if (jsonMatch) {
         relatedTopicsData = JSON.parse(jsonMatch[1]);
@@ -273,20 +270,17 @@ Respond only with valid JSON.`;
       }
     }
 
-    // Validate structure
     if (!relatedTopicsData.relatedTopics || !Array.isArray(relatedTopicsData.relatedTopics) ||
         !relatedTopicsData.nextLearningPaths || !Array.isArray(relatedTopicsData.nextLearningPaths)) {
       throw new Error('Invalid related topics structure received from Gemini');
     }
 
-    // Ensure we have reasonable number of suggestions
     relatedTopicsData.relatedTopics = relatedTopicsData.relatedTopics.slice(0, 6);
     relatedTopicsData.nextLearningPaths = relatedTopicsData.nextLearningPaths.slice(0, 5);
 
     return relatedTopicsData;
   } catch (error: any) {
     console.error('Gemini API error generating related topics:', error);
-    // Return empty arrays on error instead of throwing
     return {
       relatedTopics: [],
       nextLearningPaths: [],

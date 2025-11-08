@@ -9,9 +9,9 @@ const requestSchema = z.object({
 
 export async function generateMap(req: Request, res: Response) {
   try {
-    // Validate request
     const validationResult = requestSchema.safeParse(req.body);
     if (!validationResult.success) {
+      console.log('Invalid request received');
       return res.status(400).json({
         error: 'Invalid request',
         details: validationResult.error.errors,
@@ -19,27 +19,30 @@ export async function generateMap(req: Request, res: Response) {
     }
 
     const { topic, level } = validationResult.data;
+    console.log(`New request: Generating roadmap for "${topic}" (${level} level)`);
 
-    // Check for Gemini API key
     if (!process.env.GEMINI_API_KEY) {
+      console.error('Gemini API key not configured');
       return res.status(500).json({
         error: 'Gemini API key not configured',
         message: 'Please set GEMINI_API_KEY in your environment variables',
       });
     }
 
-    // Generate roadmap using LLM
+    console.log('Calling AI to generate roadmap...');
     const roadmap = await generateLearningRoadmap(topic, level);
+    console.log(`Roadmap generated: ${roadmap.branches.length} branches`);
 
-    // Generate related topics and next learning paths (non-blocking)
     let relatedTopics = { relatedTopics: [], nextLearningPaths: [] };
     try {
+      console.log('Generating related topics...');
       relatedTopics = await generateRelatedTopics(topic, roadmap, level);
+      console.log(`Generated ${relatedTopics.relatedTopics.length} related topics and ${relatedTopics.nextLearningPaths.length} next paths`);
     } catch (error) {
-      console.warn('Failed to generate related topics, continuing without them:', error);
-      // Continue without related topics if generation fails
+      console.warn('Couldn't generate related topics, but roadmap is ready');
     }
 
+    console.log('Sending response to client');
     res.json({
       success: true,
       data: {
@@ -49,7 +52,7 @@ export async function generateMap(req: Request, res: Response) {
       },
     });
   } catch (error: any) {
-    console.error('Error generating map:', error);
+    console.error('Error generating map:', error.message);
     res.status(500).json({
       error: 'Failed to generate learning map',
       message: error.message || 'An unexpected error occurred',

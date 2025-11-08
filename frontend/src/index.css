@@ -4,119 +4,90 @@
 
 @layer base {
   body {
-    @apply bg-yellow-100 text-black;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-900;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
 @layer utilities {
-  /* Neo Brutalism Utility Classes */
-  .neo-border {
-    border: 4px solid #000;
+  .card {
+    @apply bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/50;
   }
-  
-  .neo-border-thick {
-    border: 6px solid #000;
+
+  .card-elevated {
+    @apply bg-white rounded-2xl border border-slate-200/60 shadow-xl shadow-slate-300/30;
   }
-  
-  .neo-shadow {
-    box-shadow: 8px 8px 0px 0px #000;
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold px-6 py-3 rounded-xl;
+    @apply shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40;
+    @apply transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
-  
-  .neo-shadow-sm {
-    box-shadow: 4px 4px 0px 0px #000;
+
+  .btn-secondary {
+    @apply bg-white text-slate-700 font-semibold px-6 py-3 rounded-xl border border-slate-300;
+    @apply shadow-md hover:shadow-lg transition-all duration-200;
+    @apply hover:bg-slate-50 active:scale-[0.98];
   }
-  
-  .neo-shadow-lg {
-    box-shadow: 12px 12px 0px 0px #000;
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-300 bg-white;
+    @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
+    @apply transition-all duration-200 placeholder:text-slate-400;
+    @apply shadow-sm hover:shadow-md;
   }
-  
-  .neo-button {
-    @apply neo-border neo-shadow bg-cyan-400 font-black uppercase tracking-wide;
-    transition: all 0.1s ease;
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+    @apply bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700;
   }
-  
-  .neo-button:hover:not(:disabled) {
-    transform: translate(2px, 2px);
-    box-shadow: 6px 6px 0px 0px #000;
+
+  .section-title {
+    @apply text-2xl font-bold text-slate-900 mb-2;
   }
-  
-  .neo-button:active:not(:disabled) {
-    transform: translate(4px, 4px);
-    box-shadow: 4px 4px 0px 0px #000;
+
+  .section-subtitle {
+    @apply text-sm text-slate-600 mb-4;
   }
-  
-  .neo-button:disabled {
-    @apply bg-gray-300 text-gray-500 cursor-not-allowed;
-    box-shadow: 4px 4px 0px 0px #000;
-  }
-  
-  .neo-input {
-    @apply neo-border bg-white font-bold;
-    box-shadow: 4px 4px 0px 0px #000;
-  }
-  
-  .neo-input:focus {
-    @apply outline-none;
-    box-shadow: 6px 6px 0px 0px #000;
-    transform: translate(-2px, -2px);
-  }
-  
-  .neo-card {
-    @apply neo-border bg-white neo-shadow;
-  }
-  
+
   .react-flow__node {
-    @apply neo-border;
+    @apply rounded-xl border-2 border-slate-300 shadow-md;
+    transition: all 0.2s ease;
   }
-  
-  /* Ensure links in nodes are clickable */
+
+  .react-flow__node:hover {
+    @apply shadow-lg border-indigo-400;
+    transform: translateY(-2px);
+  }
+
   .react-flow__node a {
     pointer-events: auto !important;
     position: relative;
     z-index: 10;
   }
-  
-  /* Prevent React Flow from blocking pointer events on links */
+
   .react-flow__node-content {
     pointer-events: auto;
   }
-  
-  /* Animations */
+
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(10px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
-  
+
   .animate-fadeIn {
-    animation: fadeIn 0.5s ease-out;
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  
-  /* Smooth transitions */
-  * {
-    transition-property: opacity, transform, scale;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  /* Expandable node animations */
-  .expandable-node {
-    transition: all 0.3s ease;
-  }
-  
-  .expandable-node:hover {
-    transform: scale(1.05);
-  }
-  
-  .expanded-content {
-    animation: slideDown 0.3s ease-out;
-  }
-  
+
   @keyframes slideDown {
     from {
       opacity: 0;
@@ -125,9 +96,56 @@
     }
     to {
       opacity: 1;
-      max-height: 1000px;
+      max-height: 800px;
       transform: translateY(0);
     }
   }
-}
 
+  .expanded-content {
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .expanded-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .expanded-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  .expanded-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  .expanded-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  * {
+    transition-property: opacity, transform, scale, box-shadow;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .expandable-node {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .expandable-node:hover {
+    transform: translateY(-2px);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent;
+    display: inline-block;
+    line-height: 1.1;
+    padding-bottom: 0.2em;
+    margin-bottom: 0;
+    overflow: visible;
+    position: relative;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
