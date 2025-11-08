@@ -1,4 +1,4 @@
-# 🗺️ Inagiffy - AI-Powered Interactive Learning Maps
+# Inagiffy - AI-Powered Interactive Learning Maps
 
 Inagiffy is a full-stack web application that generates beautiful, interactive learning roadmaps for any topic using AI. Simply enter a topic, and watch as AI breaks it down into structured branches, subtopics, and learning resources.
 
@@ -9,23 +9,23 @@ Inagiffy is a full-stack web application that generates beautiful, interactive l
 
 ---
 
-## 📖 Table of Contents
+## Table of Contents
 
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Setup Instructions](#-setup-instructions)
-- [Running Locally](#-running-locally)
-- [API Documentation](#-api-documentation)
-- [JSON Schema Reference](#-json-schema-reference)
-- [Deployment](#-deployment)
-- [Example Usage](#-example-usage)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Setup Instructions](#setup-instructions)
+- [Running Locally](#running-locally)
+- [API Documentation](#api-documentation)
+- [JSON Schema Reference](#json-schema-reference)
+- [Deployment](#deployment)
+- [Example Usage](#example-usage)
 
 ---
 
-## ✨ Features
+## Features
 
-- **AI-Powered Generation**: Uses OpenAI GPT-4 Turbo to generate structured learning roadmaps
+- **AI-Powered Generation**: Uses Google Gemini API to generate structured learning roadmaps
 - **Interactive Visualization**: Beautiful, expandable node-based maps using React Flow
 - **Learning Levels**: Support for Beginner, Intermediate, and Advanced levels
 - **Resource Links**: Each subtopic includes curated learning resources (articles, videos, books)
@@ -35,9 +35,10 @@ Inagiffy is a full-stack web application that generates beautiful, interactive l
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
+
 - **React 18** - UI framework
 - **TypeScript** - Type safety
 - **Vite** - Build tool and dev server
@@ -46,15 +47,16 @@ Inagiffy is a full-stack web application that generates beautiful, interactive l
 - **Axios** - HTTP client
 
 ### Backend
+
 - **Node.js** - Runtime
 - **Express** - Web framework
 - **TypeScript** - Type safety
-- **OpenAI SDK** - GPT-4 integration
+- **Google Gemini API** - AI integration
 - **Zod** - Schema validation
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Inagiffy/
@@ -86,12 +88,12 @@ Inagiffy/
 
 ---
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 ### Prerequisites
 
 - **Node.js** 18+ and npm
-- **OpenAI API Key** ([Get one here](https://platform.openai.com/api-keys))
+- **Gemini API Key** ([Get one here](https://makersuite.google.com/app/apikey))
 
 ### Step 1: Clone the Repository
 
@@ -126,11 +128,11 @@ cd backend
 cp .env.example .env
 ```
 
-Edit `.env` and add your OpenAI API key:
+Edit `.env` and add your Gemini API key:
 
 ```env
 PORT=3001
-OPENAI_API_KEY=your_openai_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 ### Step 4: Run the Application
@@ -144,11 +146,13 @@ npm run dev
 #### Option B: Run Separately
 
 **Terminal 1 - Backend:**
+
 ```bash
 npm run dev:backend
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 npm run dev:frontend
 ```
@@ -160,7 +164,7 @@ npm run dev:frontend
 
 ---
 
-## 🏃 Running Locally
+## Running Locally
 
 ### Development Mode
 
@@ -182,7 +186,7 @@ cd backend && npm start
 
 ---
 
-## 📡 API Documentation
+## API Documentation
 
 ### Base URL
 
@@ -207,6 +211,7 @@ Generates a learning roadmap for the given topic.
 ```
 
 **Parameters:**
+
 - `topic` (string, required): The subject to generate a roadmap for
 - `level` (string, optional): Learning level - `"beginner"`, `"intermediate"`, or `"advanced"`. Defaults to `"intermediate"`.
 
@@ -264,7 +269,7 @@ Health check endpoint.
 
 ---
 
-## 📋 JSON Schema Reference
+## JSON Schema Reference
 
 The learning roadmap follows this structure:
 
@@ -295,47 +300,7 @@ interface LearningResource {
 
 ---
 
-## 🌐 Deployment
-
-### Frontend (Vercel)
-
-1. **Install Vercel CLI:**
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Deploy:**
-   ```bash
-   cd frontend
-   vercel
-   ```
-
-3. **Configure Environment:**
-   - Update `vite.config.ts` to point to your backend URL in production
-   - Or set `VITE_API_URL` environment variable in Vercel dashboard
-
-### Backend (Render)
-
-1. **Create a new Web Service** on [Render](https://render.com)
-
-2. **Connect your GitHub repository**
-
-3. **Configure:**
-   - **Build Command:** `cd backend && npm install && npm run build`
-   - **Start Command:** `cd backend && npm start`
-   - **Environment Variables:**
-     - `OPENAI_API_KEY`: Your OpenAI API key
-     - `PORT`: 3001 (or let Render auto-assign)
-
-4. **Deploy**
-
-### Alternative: Railway / Fly.io
-
-Both platforms support similar deployment workflows. Refer to their documentation for Node.js/Express apps.
-
----
-
-## 💡 Example Usage
+## Example Usage
 
 ### Example 1: Generate a Roadmap
 
@@ -353,14 +318,16 @@ curl -X POST http://localhost:3001/api/generate-map \
 The system uses a two-prompt approach:
 
 **System Prompt:**
+
 > You are an expert educational content planner and topic mapper. Given a subject, you generate a structured, hierarchical roadmap breaking it into subtopics, with short descriptions and 1–2 recommended resources per subtopic.
 
 **User Prompt:**
+
 > Generate a learning roadmap for: `{topic}`. Tailor it for `{level}` learners. Include 3–6 main branches, each with 3–5 subtopics and 1–2 learning resources (article/video/book). Respond only with valid JSON.
 
 ---
 
-## 🎨 UI Features
+## UI Features
 
 - **Interactive Node Map**: Drag, zoom, and explore the learning roadmap
 - **Resource Links**: Click on resource links to open learning materials
@@ -368,49 +335,3 @@ The system uses a two-prompt approach:
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
 - **Loading States**: Visual feedback during roadmap generation
 - **Error Handling**: Clear error messages for troubleshooting
-
----
-
-## 🔧 Troubleshooting
-
-### Backend Issues
-
-**"OpenAI API key not configured"**
-- Ensure `.env` file exists in `backend/` directory
-- Verify `OPENAI_API_KEY` is set correctly
-
-**Port already in use**
-- Change `PORT` in `.env` or kill the process using port 3001
-
-### Frontend Issues
-
-**Cannot connect to backend**
-- Verify backend is running on port 3001
-- Check `vite.config.ts` proxy configuration
-
-**Build errors**
-- Run `npm install` in both `frontend/` and `backend/` directories
-- Clear `node_modules` and reinstall if needed
-
----
-
-## 📝 License
-
-This project is open source and available under the MIT License.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-## 📧 Contact
-
-For questions or support, please open an issue on GitHub.
-
----
-
-**Built with ❤️ for learners everywhere**
-
