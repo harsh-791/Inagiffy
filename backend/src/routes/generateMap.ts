@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { generateLearningRoadmap, generateRelatedTopics } from '../services/llmService';
+import { generateLearningRoadmap, generateRelatedTopics, RelatedTopicsResponse } from '../services/llmService';
 
 const requestSchema = z.object({
   topic: z.string().min(1, 'Topic is required'),
@@ -33,7 +33,7 @@ export async function generateMap(req: Request, res: Response) {
     const roadmap = await generateLearningRoadmap(topic, level);
     console.log(`Roadmap generated: ${roadmap.branches.length} branches`);
 
-    let relatedTopics = { relatedTopics: [], nextLearningPaths: [] };
+    let relatedTopics: RelatedTopicsResponse = { relatedTopics: [], nextLearningPaths: [] };
     try {
       console.log('Generating related topics...');
       relatedTopics = await generateRelatedTopics(topic, roadmap, level);
